@@ -18,11 +18,15 @@
         position: absolute;
         z-index: 1;
         left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 50px;
+        top: 52%;
+        transform: translate(-50%, -52%);
+        font-size: 46px;
         opacity: 0.5;
         white-space: pre;
+      }
+      .text1 {
+        top: 48%;
+        font-size: 14px;
       }
       @keyframes run {
         0% {
@@ -40,6 +44,7 @@
 
   <body>
     <div class="text">I LOVE YOU</div>
+    <div id="text" class="text text1"></div>
     <canvas id="myCanvas"></canvas>
     <script>
       function heart() {
@@ -141,11 +146,11 @@
         render();
       }
       function getX(t) {
-        return 15 * (12 * Math.sin(t) - 4 * Math.sin(3 * t));
+        return 12 * (12 * Math.sin(t) - 4 * Math.sin(3 * t));
       }
       function getY(t, bl = 1) {
         return (
-          -15 *
+          -12 *
           (13 * Math.cos(t) -
             5 * Math.cos(2 * t) -
             2 * Math.cos(3 * t) -
@@ -153,6 +158,29 @@
         );
       }
       heart();
+
+      /**
+       * 获取 url 参数
+       * @param {*} variable 传入 key
+       * @returns 有值就返回值，没有就返回 false
+       */
+      const getQueryVariable = (variable) => {
+        let query = window.location.search.substring(1);
+        let vars = query.split("&");
+        console.log(query, vars.length);
+        for (let i = 0; i < vars.length; i++) {
+          let pair = vars[i].split("=");
+          if (pair[0] == variable) {
+            console.log(decodeURI(pair[1]));
+            return decodeURI(pair[1]);
+          }
+        }
+        return false;
+      };
+      (function () {
+        let t = getQueryVariable("t");
+        text.innerHTML = t ? t : "I LOVE YOU";
+      })();
     </script>
   </body>
 </html>
