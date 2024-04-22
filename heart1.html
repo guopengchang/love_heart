@@ -65,30 +65,27 @@
 
       @media screen and (max-width: 750px) {
         #heart {
-          transform: scale(0.5);
-          animation: animate-small 1.2s infinite;
+          transform: scale(0);
+          animation: animate-small 12s infinite;
         }
 
         #text {
-          /* æ–‡å­—ä¹Ÿå°ä¸€ç‚¹ */
           font-size: 4em;
           margin-top: -0.3em;
 
-          animation: animate-small 1.2s infinite;
+          animation: animate-small 12s infinite;
         }
 
         @keyframes animate-small {
           0% {
+            transform: scale(0.1);
+          }
+
+          50% {
             transform: scale(0.5);
-          }
-          30% {
-            transform: scale(0.4);
-          }
-          60% {
-            transform: scale(0.6);
           }
           100% {
-            transform: scale(0.5);
+            transform: scale(0.1);
           }
         }
       }
@@ -126,9 +123,7 @@
      */
     ((text) => {
       let t = getQueryVariable("t");
-      if (t) {
-        text.innerHTML = t;
-      }
+      text.innerHTML = t ? t : "I LOVE YOU";
     })(document.querySelector("#text"));
 
     /**

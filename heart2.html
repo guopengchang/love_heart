@@ -43,16 +43,34 @@
         color: rgb(215, 61, 133);
       }
       .text1 {
-        top: 45%;
-        font-size: 14px;
+        top: 47%;
+        font-size: 24px;
       }
     </style>
   </head>
   <body>
     <div class="text">I LOVE YOU</div>
-    <div class="text text1"></div>
-    <canvas id="pinkboard"></canvas>
+    <div id="text" class="text text1"></div>
+    <canvas id="heart"></canvas>
     <script>
+      const getQueryVariable = (variable) => {
+        let query = window.location.search.substring(1);
+        let vars = query.split("&");
+        console.log(query, vars.length);
+        for (let i = 0; i < vars.length; i++) {
+          let pair = vars[i].split("=");
+          if (pair[0] == variable) {
+            console.log(decodeURI(pair[1]));
+            return decodeURI(pair[1]);
+          }
+        }
+        return false;
+      };
+
+      (function () {
+        let t = getQueryVariable("t");
+        text.innerHTML = t ? t : "I LOVE YOU";
+      })();
       /*
        * Settings
        particles 微粒；粒子；
@@ -335,7 +353,7 @@
           onResize();
           render();
         }, 10);
-      })(document.getElementById("pinkboard"));
+      })(document.getElementById("heart"));
     </script>
   </body>
 </html>
