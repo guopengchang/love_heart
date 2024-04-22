@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        /* å¸¸è§„åˆå§‹åŒ– */
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        /* å¸¸è§„å±…ä¸­æ˜¾ç¤º */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+
+        min-height: 100vh;
+        /* é»‘è‰²èƒŒæ™¯è‰² */
+        background-color: #000;
+      }
+
+      #heart {
+        /* å¿ƒçš„æ˜¾ç¤ºåŒºåŸŸå®½é«˜ */
+        width: 750px;
+        height: 750px;
+
+        /* å¿ƒè·³çš„åŠ¨ç”» */
+        animation: animate cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+      }
+
+      #text {
+        /* ä¸­é—´æ–‡å­—çš„é¢œè‰²ã€å¤§å°ã€å­—ä½“é˜´å½± */
+        color: white;
+        font-size: 5em;
+        text-align: center;
+        text-shadow: 0 0 0.05em #fff, 0 0 0.2em #ee3e3e, 0 0 0.3em #f80808;
+        /* ç¨å¾®å‘ä¸Šç§»ä¸€ç‚¹ï¼Œçœ‹èµ·æ¥åœ¨ä¸­é—´ */
+        margin-top: -0.6em;
+        /* ä¸è®©é€‰ä¸­ */
+        user-select: none;
+
+        /* å®šä½æ”¾ä¸­é—´ */
+        position: absolute;
+
+        /* åŒæ ·çš„è·Ÿç€å¿ƒè·³ */
+        animation: animate 12s infinite;
+        font-weight: 100;
+      }
+      @keyframes animate {
+        /* åŠ¨ç”»å°±æ˜¯ç®€å•çš„æ”¾å¤§ç¼©å° */
+        0% {
+          transform: scale(0);
+        }
+        30% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(0);
+        }
+      }
+
+      @media screen and (max-width: 750px) {
+        #heart {
+          /* å°å±å¹•ä¸Šé¢è¦å°ä¸€åœˆï¼ŒåŠ¨ç”»ä¹Ÿè¦å°ä¸€åœˆ */
+          transform: scale(0.5);
+          animation: animate-small 1.2s infinite;
+        }
+
+        #text {
+          /* æ–‡å­—ä¹Ÿå°ä¸€ç‚¹ */
+          font-size: 4em;
+          margin-top: -0.3em;
+
+          animation: animate-small 1.2s infinite;
+        }
+
+        @keyframes animate-small {
+          0% {
+            transform: scale(0.5);
+          }
+          30% {
+            transform: scale(0.4);
+          }
+          60% {
+            transform: scale(0.6);
+          }
+          100% {
+            transform: scale(0.5);
+          }
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="heart"></canvas>
+
+    <h1 id="text"></h1>
+  </body>
+  <script>
+    /**
+     * 自动填充文字部分
+     */
+    /**
+     * 获取 url 参数
+     * @param {*} variable 传入 key
+     * @returns 有值就返回值，没有就返回 false
+     */
+    const getQueryVariable = (variable) => {
+      let query = window.location.search.substring(1);
+      let vars = query.split("&");
+      console.log(query, vars.length);
+      for (let i = 0; i < vars.length; i++) {
+        let pair = vars[i].split("=");
+        if (pair[0] == variable) {
+          console.log(decodeURI(pair[1]));
+          return decodeURI(pair[1]);
+        }
+      }
+      return false;
+    };
+    /**
+     * 将 url 地址中的 t 参数放入文字显示区域
+     */
+    ((text) => {
+      let t = getQueryVariable("t");
+      if (t) {
+        text.innerHTML = t;
+      }
+    })(document.querySelector("#text"));
+
+    /**
+     * 下面全是 爱心代码部分
+     */
+    const settings = {
+      length: 3200, // 最大颗粒数量
+      duration: 4, // 粒子持续时间
+      velocity: 80, // 粒子速度
+      effect: -0.8, // 超出部分
+      size: 18, // 粒子大小 （像素）
+      color: "#ee3e3e", // 颜色
+    };
+
+    /**
+     * Point
+     */
+    const Point = (() => {
+      function Point(x, y) {
+        // 将参数 x 赋值给点的 x 坐标，如果 x 是 undefined，则将其设置为 0
+        this.x = typeof x !== "undefined" ? x : 0;
+        this.y = typeof y !== "undefined" ? y : 0;
+      }
+
+      Point.prototype.clone = function () {
+        // 返回一个新的 Point 对象，其坐标与当前对象相同，即实现了点的复制功能。
+        return new Point(this.x, this.y);
+      };
+
+      Point.prototype.length = function (length) {
+        // 用于计算点到原点的距离，并可以设置点的长度。
+        if (typeof length == "undefined") {
+          //算二维平面上两点之间距离的公式
+          return Math.sqrt(this.x * this.x + this.y * this.y);
+        }
+        // 如果传入了参数 length，则调用 normalize 方法，将点的坐标标准化
+
+        this.normalize();
+        // 将点的 y 坐标乘以传入的参数 length，即设置点的长度。
+        this.x *= length;
+        this.y *= length;
+        return this;
+      };
+
+      Point.prototype.normalize = function () {
+        let length = this.length();
+        this.x /= length;
+        this.y /= length;
+        return this;
+      };
+
+      return Point;
+    })();
+
+    /**
+     * Particle 粒子
+     */
+    const Particle = (() => {
+      function Particle() {
+        this.position = new Point();
+        this.velocity = new Point();
+        this.acceleration = new Point();
+        this.age = 0;
+      }
+
+      Particle.prototype.initialize = function (x, y, dx, dy) {
+        this.position.x = x;
+        this.position.y = y;
+        this.velocity.x = dx;
+        this.velocity.y = dy;
+        this.acceleration.x = dx * settings.effect;
+        this.acceleration.y = dy * settings.effect;
+        this.age = 0;
+      };
+
+      Particle.prototype.update = function (deltaTime) {
+        this.position.x += this.velocity.x * deltaTime;
+        this.position.y += this.velocity.y * deltaTime;
+        this.velocity.x += this.acceleration.x * deltaTime;
+        this.velocity.y += this.acceleration.y * deltaTime;
+        this.age += deltaTime;
+      };
+
+      Particle.prototype.draw = function (context, image) {
+        function ease(t) {
+          return --t * t * t + 1;
+        }
+        let size = image.width * ease(this.age / settings.duration);
+        context.globalAlpha = 1 - this.age / settings.duration;
+        context.drawImage(
+          image,
+          this.position.x - size / 2,
+          this.position.y - size / 2,
+          size,
+          size,
+        );
+      };
+
+      return Particle;
+    })();
+
+    /**
+     * ParticlePool 粒子池
+     */
+    const ParticlePool = (() => {
+      let particles,
+        firstActive = 0,
+        firstFree = 0,
+        duration = settings.duration;
+
+      function ParticlePool(length) {
+        // 创建和填充粒子池
+        particles = new Array(length);
+        for (var i = 0; i < particles.length; i++)
+          particles[i] = new Particle();
+      }
+
+      ParticlePool.prototype.add = function (x, y, dx, dy) {
+        particles[firstFree].initialize(x, y, dx, dy);
+
+        // 处理循环队列
+        firstFree++;
+        if (firstFree == particles.length) firstFree = 0;
+        if (firstActive == firstFree) firstActive++;
+        if (firstActive == particles.length) firstActive = 0;
+      };
+
+      ParticlePool.prototype.update = function (deltaTime) {
+        let i;
+
+        // 更新活动粒子
+        if (firstActive < firstFree) {
+          for (i = firstActive; i < firstFree; i++)
+            particles[i].update(deltaTime);
+        }
+        if (firstFree < firstActive) {
+          for (i = firstActive; i < particles.length; i++)
+            particles[i].update(deltaTime);
+          for (i = 0; i < firstFree; i++) particles[i].update(deltaTime);
+        }
+
+        // 删除不活跃的粒子
+        while (
+          particles[firstActive].age >= duration &&
+          firstActive != firstFree
+        ) {
+          firstActive++;
+          if (firstActive == particles.length) firstActive = 0;
+        }
+      };
+
+      ParticlePool.prototype.draw = function (context, image) {
+        // 画出活动粒子
+        if (firstActive < firstFree) {
+          for (i = firstActive; i < firstFree; i++)
+            particles[i].draw(context, image);
+        }
+        if (firstFree < firstActive) {
+          for (i = firstActive; i < particles.length; i++)
+            particles[i].draw(context, image);
+          for (i = 0; i < firstFree; i++) particles[i].draw(context, image);
+        }
+      };
+
+      return ParticlePool;
+    })();
+
+    /**
+     * 绘制爱心
+     */
+    ((canvas) => {
+      let context = canvas.getContext("2d");
+      let particles = new ParticlePool(settings.length);
+      let particleRate = settings.length / settings.duration; // 粒子/秒
+      let time;
+
+      // 画出心对应的点 -PI <= t <= PI
+      function pointOnHeart(t) {
+        return new Point(
+          160 * Math.pow(Math.sin(t), 3),
+          130 * Math.cos(t) -
+            50 * Math.cos(2 * t) -
+            20 * Math.cos(3 * t) -
+            10 * Math.cos(4 * t) +
+            25,
+        );
+      }
+
+      // 使用虚拟画布创建粒子图像
+      const image = (function () {
+        let canvas = document.createElement("canvas"),
+          context = canvas.getContext("2d");
+        canvas.width = settings.size;
+        canvas.height = settings.size;
+
+        // 创建路径
+        function to(t) {
+          let point = pointOnHeart(t);
+          point.x = settings.size / 2 + (point.x * settings.size) / 350;
+          point.y = settings.size / 2 - (point.y * settings.size) / 350;
+          return point;
+        }
+        // 创建路径
+        context.beginPath();
+        let t = -Math.PI;
+        let point = to(t);
+
+        context.moveTo(point.x, point.y);
+        while (t < Math.PI) {
+          t += 0.01; // 帧步数
+          point = to(t);
+          context.lineTo(point.x, point.y);
+        }
+        context.closePath();
+        // 创建填充颜色
+        context.fillStyle = settings.color;
+        context.fill();
+        // 创建图像
+        let image = new Image();
+        image.src = canvas.toDataURL();
+        return image;
+      })();
+
+      // 渲染
+      function render() {
+        // 下一个动画帧
+        requestAnimationFrame(render);
+
+        // 更新时间
+        let newTime = new Date().getTime() / 1000;
+        let deltaTime = newTime - (time || newTime);
+        time = newTime;
+
+        // 清理画布
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 创建新的粒子
+        var amount = particleRate * deltaTime;
+        for (var i = 0; i < amount; i++) {
+          var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
+          var dir = pos.clone().length(settings.velocity);
+          particles.add(
+            canvas.width / 2 + pos.x,
+            canvas.height / 2 - pos.y,
+            dir.x,
+            -dir.y,
+          );
+        }
+        // 更新和绘制粒子
+        particles.update(deltaTime);
+        particles.draw(context, image);
+      }
+
+      // 重绘画布的大小
+      function onResize() {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+      }
+      window.onresize = onResize;
+
+      // 延迟渲染
+      setTimeout(function () {
+        onResize();
+        render();
+      }, 10);
+    })(document.getElementById("heart"));
+  </script>
+  <script></script>
+</html>

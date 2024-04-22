@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Love Heart Effect</title>
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f8f8f8;
+      }
+      .heart {
+        width: 100px;
+        height: 90px;
+        position: relative;
+        animation: beat 1s infinite;
+        transform-origin: center bottom;
+      }
+      .heart::before,
+      .heart::after {
+        content: "";
+        width: 50px;
+        height: 80px;
+        background-color: #fc2e5a;
+        position: absolute;
+        border-radius: 50px 50px 0 0;
+        transform: rotate(-45deg);
+        top: 0;
+      }
+      .heart::after {
+        left: 50px;
+        transform: rotate(45deg);
+      }
+      @keyframes beat {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="heart"></div>
+    <script>
+      // Optional: You can also add interactivity to make the heart appear on click or other events.
+      // For simplicity, the heart will appear automatically in this example.
+    </script>
+  </body>
+</html>
