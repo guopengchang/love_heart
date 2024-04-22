@@ -29,7 +29,7 @@
         height: 750px;
 
         /* å¿ƒè·³çš„åŠ¨ç”» */
-        animation: animate cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        animation: animate 22s linear infinite;
       }
 
       #text {
@@ -47,7 +47,7 @@
         position: absolute;
 
         /* åŒæ ·çš„è·Ÿç€å¿ƒè·³ */
-        animation: animate 12s infinite;
+        animation: animate 22s infinite;
         font-weight: 100;
       }
       @keyframes animate {
@@ -55,7 +55,10 @@
         0% {
           transform: scale(0);
         }
-        30% {
+        20% {
+          transform: scale(1);
+        }
+        80% {
           transform: scale(1);
         }
         100% {
@@ -66,14 +69,14 @@
       @media screen and (max-width: 750px) {
         #heart {
           transform: scale(0);
-          animation: animate-small 12s infinite;
+          animation: animate-small 22s infinite;
         }
 
         #text {
           font-size: 4em;
           margin-top: -0.3em;
 
-          animation: animate-small 12s infinite;
+          animation: animate-small 22s infinite;
         }
 
         @keyframes animate-small {
@@ -81,8 +84,11 @@
             transform: scale(0.1);
           }
 
-          50% {
-            transform: scale(0.5);
+          20% {
+            transform: scale(0.6);
+          }
+          80% {
+            transform: scale(0.6);
           }
           100% {
             transform: scale(0.1);
